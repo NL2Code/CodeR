@@ -11,9 +11,6 @@ GitHub issue resolving recently has attracted significant attention from academi
 ## CodeR's results on SWE-agent lite
 ![CodeR](figs/coder-results.png)
 
-## Evaluation results, logs, and trajectory
-Coming soon!
-
 ## Citation
 ```
 @misc{chen2024coder,
