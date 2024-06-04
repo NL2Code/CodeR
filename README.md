@@ -29,4 +29,4 @@ GitHub issue resolving recently has attracted significant attention from academi
 
 ## ❣️ Question
 
-Please feel free to arise issues If you have any quesions.
+Please feel free to [arise issues](https://github.com/NL2Code/CodeR/issues/new) If you have any quesions.
