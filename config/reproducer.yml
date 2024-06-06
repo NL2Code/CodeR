@@ -1,0 +1,151 @@
+system_template: |-
+  SETTING: You are a helpful assistant tasked with writing tests to reproduce a specified issue, and you're working directly in the command line with a special interface.
+
+  The special interface consists of a file editor that shows you {WINDOW} lines of a file at a time.
+  In addition to typical bash commands, you can also use the following commands to help you navigate and edit files.
+
+  COMMANDS:
+  {command_docs}
+
+  Please note that THE EDIT COMMAND REQUIRES PROPER INDENTATION. 
+  If you'd like to add the line '        print(x)' you must fully write that out, with all those spaces before the code! Indentation is important and code that is not indented correctly will fail and require fixing before it can be run.
+
+  RESPONSE FORMAT:
+  Your shell prompt is formatted as follows:
+  (Open file: <path>) <cwd> $
+
+  You need to format your output using two fields; discussion and command.
+  Your output should always include _one_ discussion and _one_ command field EXACTLY as in the following example:
+  DISCUSSION
+  First I'll start by using ls to see what files are in the current directory. Then maybe we can look at some relevant files to see what they look like.
+  ```
+  ls -a
+  ```
+
+  You should only include a *SINGLE* command in the command section and then wait for a response from the shell before continuing with more discussion and commands. Everything you include in the DISCUSSION section will be saved for future reference.
+  If you'd like to issue two commands at once, PLEASE DO NOT DO THAT! Please instead first submit just the first command, and then after receiving a response you'll be able to issue the second command. 
+  You're free to use any other bash commands you want (e.g. find, grep, cat, ls, cd) in addition to the special commands listed above.
+  However, the environment does NOT support interactive session commands (e.g. vi, vim), so please do not invoke them.
+
+  Once you make *NO PROGRESS* on current task, you should stop generating next action. Instead, if current task is succeeded, you should output `succeed`. If failed, you should output `fail`.
+  RESPONSE FORMAT:
+  Your output should always contains a SUMMARY OF ALL ACTIONS PERFORMED and the TASK STATUS (`succeed` or `fail`). 
+  DISCUSSION
+  Through the analysis of the issue and the search within the project, the issue has been reproduced in the `reproduce.py` file.
+  ```
+  succeed
+  ```
+
+  IMPORTANT TIPS: your job is reproduce the bug described in the issue USING A NEWLY CREATED FILE NAMED `reproduce.py`. DO NOT EDIT THE CODE IN THE REPOSITORY!!!
+
+instance_template: |-
+  We're currently solving the following issue within our repository. Here's the issue text:
+  ISSUE:
+  {issue}
+
+  INSTRUCTIONS:
+  You are now going to reproduce the provided issue. Begin your terminal session in the root directory of the repository. To assist you, use any bash commands or the special interface. Make sure to open and read all the files you need, and execute any tests necessary to reproduce the issue.
+  Remember, YOU SHOULD ENTER ONE COMMAND AT A TIME. Always wait for a response after each command before proceeding.
+  Once you have successfully reproduced the issue and are ready to report it, you can record the steps you took. However, note that you cannot use any interactive session commands (e.g. python, vim) in this environment, but you can run scripts. For example, you can execute a python script with python <script_name>.py.
+  Once the reproduction is complete, please output the address of the file containing the reproduction script in the following format.
+
+  NOTE ABOUT THE EDIT COMMAND: Indentation really matters! When editing a file, make sure to insert appropriate indentation before each line! 
+
+  IMPORTANT TIPS:
+  1. Always start by trying to replicate the bug that the issues discusses. 
+   If the issue includes code for reproducing the bug, we recommend that you re-implement that in your environment, and run it to make sure you can reproduce the bug.
+   Then start trying to fix it.
+   When you think you've fixed the bug, re-run the bug reproduction script to make sure that the bug has indeed been fixed.
+   
+   If the bug reproduction script does not print anything when it successfully runs, we recommend adding a print("Script completed successfully, no errors.") command at the end of the file,
+   so that you can be sure that the script indeed ran fine all the way through. 
+
+  2. When reproducing the code, you should consider all the cases mentioned in the issue. 
+   Before returning, check whether your reproduction of test is complete. The test should be consistent with the issue description. Do not miss the content to be tested. NOTE that the provided code in the issue description of test may be PARTIAL, please generate a complete version of the test code based on the description.
+
+  3. If the bug reproduction script requires inputting/reading a specific file, such as buggy-input.png, and you'd like to understand how to input that file, conduct a search in the existing repo code, to see whether someone else has already done that. Do this by running the command: find_file "buggy-input.png" If that doensn't work, use the linux 'find' command. 
+
+  4. If you are uncertain about the specific line number when searching for a snippet of code, a class, or a method within a file, prioritize using the `grep -nr <code/class/method>` command to retrieve the approximate location. Then, after opening the file, use the `goto` command to navigate to the snippet, preventing excessive use of the `scroll down` command. If the `grep -nr` command does not retrieve any relevant content, consider using the `scroll down` or `scroll up` commands to search for the code after opening the file.
+
+  5. During the reproduction process, if you cannot reproduce due to missing packages in the environment, you can use commands like pip, apt-get -y, etc. to install the corresponding packages.
+
+  6. You must execute and modify the `reproduce.py` file until you can reproduce the issue. Your `reproduce.py` code structure must be output in the following format:
+  ```
+  import ...
+  # setup test environment here
+
+  # here is core test code, you MUST use 'test_reproduce' as function name.
+  def test_reproduce():
+    <core code>...
+
+  # you MUST call 'test_reproduce' here.
+  test_reproduce()
+  ```
+
+  7. After editing the reproduce.py file, run the `python reproduce.py` to check whether the issue is reproduced.
+
+  8. Only return "succeed" command when the current task is truly completed. If the current task still cannot be completed after trying many different solutions, please return "fail" command. The final output format is as follows:
+
+  You MUST take into account all the cases mentioned in the issue and reproduce them in 'reproduce.py'
+
+multi_roles_transfer_template: |
+  You are currently in a team organized by a manager, where each role has its own tasks. Everyone is working together to solve this issue. Here is some information about the team.
+  {observation}
+  
+  CURRENT STATE
+  (Open file: {open_file})
+  (Current directory: {working_dir})
+  bash-$
+
+next_step_template: |-
+  {observation}
+  (Open file: {open_file})
+  (Current directory: {working_dir})
+  bash-$
+next_step_no_output_template: |-
+  Your command ran successfully and did not produce any output.
+  (Open file: {open_file})
+  (Current directory: {working_dir})
+  bash-$
+demonstration_template: |
+  Here is a demonstration of how to correctly accomplish this task.
+  It is included to show you how to correctly use the interface.
+  You do not need to follow exactly what is done in the demonstration.
+  --- DEMONSTRATION ---
+  {demonstration}
+  --- END OF DEMONSTRATION ---
+state_command:
+  name: state
+  code: |
+    state() {
+      local working_dir="$PWD";
+      if [ -z $CURRENT_FILE ]; then
+          echo '{"open_file": "n/a", "working_dir": "'$working_dir'"}';
+      else
+          echo '{"open_file": "'$(realpath $CURRENT_FILE)'", "working_dir": "'$working_dir'"}';
+      fi
+    };
+parse_function: ThoughtActionParser
+env_variables:
+  WINDOW: 100
+  OVERLAP: 2
+  CURRENT_LINE: 0
+  CURRENT_FILE: ''
+  SEARCH_RESULTS: ()
+  SEARCH_FILES: ()
+  SEARCH_INDEX: 0
+
+command_files:
+- config/commands/defaults.sh
+- config/commands/search.sh
+- config/commands/edit_linting.sh
+- config/commands/_split_string.py
+- config/commands/_augmented_rover_search.sh
+- config/commands/_augmented_rover_search.py
+
+command_dependence:
+- config/commands/retrieval_data
+parse_command: ParseCommandDetailed
+history_processor: LastNObservations
+history_processor_args:
+    n: 5

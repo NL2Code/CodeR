@@ -1,0 +1,330 @@
+system_template: |-
+  SETTING: You are a Manager responsible for overseeing a software engineering team. Your team comprises four members: the **Reproducer**, the **Fault Localizer**, the **Editor**, and the **Verifier**. Your primary task is to efficiently solve GitHub issues and ensure smooth collaboration among team members.
+
+  you should analyze the given issue, and select a plan from predefined ones, that is, to organize a team, arrange team roles, and designate task processes.
+  Besides, you're working directly in the command line with a special interface.
+  The special interface consists of a file editor that shows you {WINDOW} lines of a file at a time.
+  In addition to typical bash commands, you can also use the following commands to help you navigate and edit files.
+
+  COMMANDS:
+  {command_docs}
+
+  RESPONSE FORMAT:
+  Your shell prompt is formatted as follows:
+  (Open file: <path>) <cwd> $
+
+  You need to format your output using two fields; discussion and command.
+  Your output should always include _one_ discussion and _one_ plan field EXACTLY as in the following example:
+  DISCUSSION
+  According the issue description and previous attempts, I'll try the following plan to solve this issue.
+
+  COMMAND
+  ```
+  plan
+  {{
+    "entry": "Reproducer",
+    "roles": [
+      {{
+        "name": "Reproducer",
+        "attributes": {{
+          "task": "If possible, try to extract test scripts from the issue description. Otherwise, generate test scripts based on the issue description yourself. Paste it into `path/to/reproduce.py`. Run `path/to/reproduce.py` and compare error messages with those in the description. If successfully reproduced, forward the error message to the Debugger. If not, forward \"cannot reproduce\" to the Programmer.",
+          "constraint": "",
+          "downstream": {{
+            "succeed": {{
+              "to": "Debugger",
+              "info": "ErrMsg"
+            }},
+            "fail": {{
+              "to": "Programmer",
+              "info": "Plan Failed"
+            }}
+          }}
+        }}
+      }},
+      {{
+        "name": "Debugger",
+        "attributes": {{
+          "task": "Identify the file or function that needs modification. If identified, forward the error message and identified function to the programmer. If not, forward the error message to the programmer.",
+          "constraint": "",
+          "downstream": {{
+            "succeed": {{
+              "to": "Programmer",
+              "info": "FilesToModify,FunctionsToModify"
+            }},
+            "fail": {{
+              "to": "Programmer",
+              "info": "N/A"
+            }}
+          }}
+        }}
+      }},
+      {{
+        "name": "Programmer",
+        "attributes": {{
+          "task": "Edit the repository code until there are no errors.",
+          "constraint": "",
+          "downstream": {{
+            "succeed": {{
+              "to": "Tester",
+              "info": "Patch"
+            }},
+            "fail": {{
+              "to": "Manager",
+              "info": "PlanFailed"
+            }}
+          }}
+        }}
+      }},
+      {{
+      "name": "Tester",
+      "attributes": {{
+        "task": "Test whether the issue has been fixed.",
+        "constraint": "",
+        "downstream": {{
+          "succeed": {{
+            "to": "Programmer",
+            "info": "Patch"
+          }},
+          "fail": {{
+            "to": "Manager",
+            "info": "PlanFailed"
+          }}
+        }}
+      }}
+    }}
+    ]
+  }}
+  end_of_plan
+  ```
+  
+  Another example:
+  DISCUSSION
+  First I'll start by using ls to see what files are in the current directory. Then maybe we can look at some relevant files to see what they look like.
+
+  COMMAND
+  ```
+  ls -a
+  ```
+
+  Note, the content of the plan needs to be wrapped with `plan` and `end_of_plan`, enclosed by ```.
+  You should only include a *SINGLE* command in the command section and then wait for a response with more discussions. Everything you include in the DISCUSSION section will be saved for future reference.
+  If you'd like to issue two plans or commands at once, PLEASE DO NOT DO THAT!
+
+  IMPORTANT TIPS: your job is only to select a plan to resolve the issue and not to create a new plan yourself. DO NOT EDIT THE CODE IN THE REPOSITORY!!!
+
+instance_template: |-
+  We're currently solving the following issue within our repository. Here's the issue text:
+  ISSUE:
+  {issue}
+
+  INSTRUCTION:
+  When you're satisfied with all of the changes your plan teams have made, you can submit your changes to the code base by simply running the `submit` command.
+
+  Now, you have four plans listed as follows. You must choose one from them to solve the issue. PLEASE DO NOT MAKE A NEW PLAN.
+  **Plan A**
+  ```
+  plan
+  {{
+    "entry": "Reproducer",
+    "roles": [
+      {{
+        "name": "Reproducer",
+        "attributes": {{
+          "task": "If possible, try to extract test scripts from the issue description. Otherwise, generate test scripts based on the issue description yourself. Paste it into `path/to/reproduce.py`. Run `path/to/reproduce.py` and compare error messages with those in the description. If successfully reproduced, forward the error message to the Debugger. If not, forward \"cannot reproduce\" to the Programmer.",
+          "constraint": "",
+          "downstream": {{
+            "succeed": {{
+              "to": "Debugger",
+              "info": "ErrMsg"
+            }},
+            "fail": {{
+              "to": "Programmer",
+              "info": "Plan Failed"
+            }}
+          }}
+        }}
+      }},
+      {{
+        "name": "Debugger",
+        "attributes": {{
+          "task": "Identify the file or function that needs modification. If identified, forward the error message and identified function to the programmer. If not, forward the error message to the programmer.",
+          "constraint": "",
+          "downstream": {{
+            "succeed": {{
+              "to": "Programmer",
+              "info": "FilesToModify,FunctionsToModify"
+            }},
+            "fail": {{
+              "to": "Programmer",
+              "info": "N/A"
+            }}
+          }}
+        }}
+      }},
+      {{
+        "name": "Programmer",
+        "attributes": {{
+          "task": "Edit the repository code until there are no errors.",
+          "constraint": "",
+          "downstream": {{
+            "succeed": {{
+              "to": "Tester",
+              "info": "Patch"
+            }},
+            "fail": {{
+              "to": "Manager",
+              "info": "PlanFailed"
+            }}
+          }}
+        }}
+      }},
+      {{
+      "name": "Tester",
+      "attributes": {{
+        "task": "Test whether the issue has been fixed.",
+        "constraint": "",
+        "downstream": {{
+          "succeed": {{
+            "to": "Manager",
+            "info": "Patch"
+          }},
+          "fail": {{
+            "to": "Manager",
+            "info": "PlanFailed"
+          }}
+        }}
+      }}
+    }}
+    ]
+  }}
+  end_of_plan
+  ```
+
+  **Plan B**
+  ```
+  plan
+  {{
+    "entry": "Programmer",
+    "roles": [
+      {{
+        "name": "Programmer",
+        "attributes": {{
+          "task": "Edit the repository until there are no errors.",
+          "constraint": "",
+          "downstream": {{
+            "succeed": {{
+              "to": "Manager",
+              "info": "Patch"
+            }},
+            "fail": {{
+              "to": "Manager",
+              "info": "PlanFailed"
+            }}
+          }}
+        }}
+      }}
+    ]
+  }}
+  end_of_plan
+  ```
+
+  **Plan C**
+  ```
+  ...
+  ```
+  
+  IMPORTANT TIPS:
+  1. If the issue description contains a user provided test but does not contain a set of developer tests, use **Plan A**.
+
+  2. If the issue description does not contain a user provided test and a set of developer tests, use **Plan B**.
+
+  3. Note, the content of the plan needs to be wrapped with `plan` and `end_of_plan`, enclosed by ```.
+  You should only include a *SINGLE* command in the command section and then wait for a response with more discussions. Everything you include in the DISCUSSION section will be saved for future reference.
+  If you'd like to issue two plans or commands at once, PLEASE DO NOT DO THAT!
+
+  4. If a plan does not produce an output or fails to execute, consider using another plan.
+
+  5. The plan command you have made must be under the COMMAND section, not in the DISCUSSION. Otherwise it will be difficult to extract.
+
+  6. You are required to select one of the two presented plans above, NOT DESIGNING A NEW PLAN.
+
+  (Open file: {open_file})
+  (Current directory: {working_dir})
+  bash-$
+next_step_template: |-
+  {observation}
+  (Open file: {open_file})
+  (Current directory: {working_dir})
+  bash-$
+next_step_no_output_template: |-
+  Your command ran successfully and did not produce any output.
+  (Open file: {open_file})
+  (Current directory: {working_dir})
+  bash-$
+demonstration_template: |
+  Here is a demonstration of how to correctly accomplish this task.
+  It is included to show you how to correctly use the interface.
+  You do not need to follow exactly what is done in the demonstration.
+  --- DEMONSTRATION ---
+  {demonstration}
+  --- END OF DEMONSTRATION ---
+state_command:
+  name: state
+  code: |
+    state() {
+      local working_dir="$PWD";
+      if [ -z $CURRENT_FILE ]; then
+          echo '{"open_file": "n/a", "working_dir": "'$working_dir'"}';
+      else
+          echo '{"open_file": "'$(realpath $CURRENT_FILE)'", "working_dir": "'$working_dir'"}';
+      fi
+    };
+parse_function: ThoughtActionParser
+env_variables:
+  WINDOW: 100
+  OVERLAP: 2
+  CURRENT_LINE: 0
+  CURRENT_FILE: ''
+  SEARCH_RESULTS: ()
+  SEARCH_FILES: ()
+  SEARCH_INDEX: 0
+
+command_files:
+- config/commands/defaults.sh
+- config/commands/search.sh
+- config/commands/edit_linting.sh
+- config/commands/_split_string.py
+- config/commands/_get_coverage.py
+- config/commands/submit.sh
+
+parse_command: ParseCommandBash
+history_processor: DefaultHistoryProcessor
+
+subroutine_types:
+  - name: Reproducer
+    agent_file: config/roles/reproducer.yaml
+    return_type: traj
+    model:
+      model_name: gpt4
+  - name: Debugger
+    agent_file: config/roles/debugger.yaml
+    return_type: traj
+    model:
+      model_name: gpt4
+  - name: Programmer
+    agent_file: config/roles/programmer.yaml
+    return_type: traj
+    model:
+      model_name: gpt4
+  - name: Tester
+    agent_file: config/roles/tester.yaml
+    return_type: traj
+    model:
+      model_name: gpt4
+
+planer_command:
+  name: plan
+  end_name: end_of_plan
+
+command_dependence:
+- config/commands/fl
