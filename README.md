@@ -5,6 +5,7 @@
 </p>
 
 ## 📰 News
+* **[Aug. 27, 2024]**:🎉 We’ve released the JAVA version of SWE-bench! Check it out on our [Leaderboard](https://multi-swe-bench.github.io). For more details, see our [paper](https://arxiv.org/pdf/2408.14354)!
 * **[Jun. 4, 2024]**: 🎉 We release CodeR, which can solve $28.33$% of issues on [SWE-bench lite](https://www.swebench.com) in the case of submitting only once per issue, Read more in our [paper](https://arxiv.org/pdf/2406.01304).
 
 ## 🌏 Abstract
