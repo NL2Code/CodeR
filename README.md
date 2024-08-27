@@ -6,7 +6,7 @@
 
 ## 📰 News
 * **[Aug. 27, 2024]**:🎉 We’ve released the JAVA version of SWE-bench! Check it out on our [Leaderboard](https://multi-swe-bench.github.io). For more details, see our [paper](https://arxiv.org/pdf/2408.14354)!
-* **[Jun. 4, 2024]**: 🎉 We release CodeR, which can solve $28.33$% of issues on [SWE-bench lite](https://www.swebench.com) in the case of submitting only once per issue, Read more in our [paper](https://arxiv.org/pdf/2406.01304).
+* **[Jun. 4, 2024]**: 🎉 We’ve released CodeR, which can solve $28.33$% of issues on [SWE-bench lite](https://www.swebench.com) in the case of submitting only once per issue, Read more in our [paper](https://arxiv.org/pdf/2406.01304).
 
 ## 🌏 Abstract
 GitHub issue resolving recently has attracted significant attention from academia and industry. SWE-bench is proposed to measure the performance in resolving issues. In this paper, we propose CodeR, which adopts a multi-agent framework and pre-defined task graphs to Repair & Resolve reported bugs and add new features within code Repository. On SWE-bench lite, CodeR is able to solve $28.33$% of issues, in the case of submitting only once for each issue. We examine the performance impact of each design of CodeR and offer insights to advance this research direction.
